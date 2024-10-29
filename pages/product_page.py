@@ -41,11 +41,18 @@ class ProductPage(BasePage):
         #В корзине не должно быть товара
         assert self.is_not_element_present(*ProductPageLocators.PRODUCT_IN_BASKET), \
             "Product in basket, but should not be"
-            
 
-    def get_empty_message(self):
-        # Получаем сообщение, что карзина пустая
-        return self.browser.find_element(*ProductPageLocators.EMPTY_BASKET_MESSAGE).text        
+    def verify_success_message(self, product_name, product_price):
+        success_message = self.get_success_message()
+        cart_price_message = self.get_cart_price_message()
+        product_name_in_success_message = self.get_product_name_in_success_message()
+
+        assert "has been added to your basket." in success_message, \
+            "Success message is incorrect"
+        assert product_name == product_name_in_success_message, \
+            "Product name in success message is incorrect"
+        assert product_price in cart_price_message, \
+            "Cart price message is incorrect"        
     
 
     

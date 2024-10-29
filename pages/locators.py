@@ -11,7 +11,7 @@ class LoginPageLocators():
     REGISTER_FORM = (By.CSS_SELECTOR, "#register_form")
     EMAIL_INPUT = (By.CSS_SELECTOR, "#id_registration-email")            # Селектор для поля email
     PASSWORD_INPUT = (By.CSS_SELECTOR, "#id_registration-password1")
-    PASSWORD_CONFIRM = (By.CSS_SELECTOR, "#id_registration-password2") # Селектор для поля пароля
+    PASSWORD_CONFIRM = (By.CSS_SELECTOR, "#id_registration-password2")   # Селектор для поля пароля
     REGISTER_BUTTON = (By.CSS_SELECTOR, "[name='registration_submit']")  # Селектор для кнопки регистрации
     
 class ProductPageLocators():
