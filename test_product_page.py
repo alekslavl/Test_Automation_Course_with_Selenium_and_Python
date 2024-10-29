@@ -3,41 +3,8 @@ from .pages.product_page import ProductPage
 from selenium.webdriver.common.by import By
 import time
 from .pages.basket_page import BasketPage
-
-'''@pytest.mark.parametrize('link', ["http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer0",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer1",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer2",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer3",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer4",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer5",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer6",
-                                  pytest.param("http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer7", marks=pytest.mark.xfail),
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer8",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer9"])
-def test_guest_can_add_product_to_basket(browser, link):
-    link = f"{link}"
-    page = ProductPage(browser, link)   # инициализируем Page Object, передаем в конструктор экземпляр драйвера и url адрес 
-    page.open()                      # открываем страницу
-    
-    # Получаем название и цену товара
-    product_name = page.get_product_name()
-    product_price = page.get_product_price()
-    # Добавляем товар в корзину
-    page.add_to_basket()
-    # Получаем код
-    page.solve_quiz_and_get_code()
-    
-    # Получаем сообщение об успешном добавлении товара и сообщение о стоимости корзины
-    success_message = page.get_success_message()
-    cart_price_message = page.get_cart_price_message()
-    product_name_in_success_message = page.get_product_name_in_success_message()
-    
-    time.sleep(1)
-    
-    # Проверяем результаты
-    assert "has been added to your basket." in success_message #The shellcoder's handbook has been added to your basket.
-    assert product_name == product_name_in_success_message
-    assert product_price in cart_price_message
+from .pages.login_page import LoginPage
+from .pages.base_page import BasePage
     
 @pytest.mark.xfail # Заранее помечаем, что тест упадет
 def test_guest_cant_see_success_message_after_adding_product_to_basket(browser):
@@ -47,14 +14,6 @@ def test_guest_cant_see_success_message_after_adding_product_to_basket(browser):
     
     # Добавляем товар в корзину
     page.add_to_basket()
-    
-    # Получаем сообщение об успешном добавлении товара
-    page.should_not_be_success_message()
-    
-def test_guest_cant_see_success_message(browser):
-    link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
-    page = ProductPage(browser, link)   # инициализируем Page Object, передаем в конструктор экземпляр драйвера и url адрес 
-    page.open()                         # открываем страницу
     
     # Получаем сообщение об успешном добавлении товара
     page.should_not_be_success_message()
@@ -82,7 +41,7 @@ def test_guest_can_go_to_login_page_from_product_page(browser):
     link = "http://selenium1py.pythonanywhere.com/en-gb/catalogue/the-city-and-the-stars_95/"
     page = ProductPage(browser, link)
     page.open()
-    page.go_to_login_page()'''
+    page.go_to_login_page()
     
 def test_guest_cant_see_product_in_basket_opened_from_product_page(browser):
     link = "http://selenium1py.pythonanywhere.com/en-gb/catalogue/the-city-and-the-stars_95/" 
@@ -98,6 +57,67 @@ def test_guest_cant_see_product_in_basket_opened_from_product_page(browser):
     # Получаем сообщение, что корзина пустая
     empty_message = product_page.get_empty_message() 
     assert "empty" in empty_message, "Basket is not empty"  #4. Ожидаем, что есть текст о том что корзина пуста
+    
+@pytest.mark.login
+class TestUserAddToBasketFromProductPage():
+    @pytest.fixture(scope="function", autouse=True)
+    def setup(self, browser):
+        # Открываем страницу регистрации
+        link = "http://selenium1py.pythonanywhere.com/en-gb/accounts/login/"
+        page = LoginPage(browser, link)
+        page.open()
+        
+        # Генерируем email и регистрируем нового пользователя
+        email = str(time.time()) + "@fakemail.org"
+        password = "TestPassword123"
+        page.register_new_user(email, password)
+        
+        # Проверяем, что пользователь залогинен
+        base_page = BasePage(browser, browser.current_url)
+        base_page.should_be_authorized_user()
+        
+    def test_user_cant_see_success_message(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
+        page = ProductPage(browser, link)   # инициализируем Page Object, передаем в конструктор экземпляр драйвера и url адрес 
+        page.open()                         # открываем страницу
+    
+        # Получаем сообщение об успешном добавлении товара
+        page.should_not_be_success_message()
+        
+    '''@pytest.mark.parametrize('link', ["http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer0",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer1",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer2",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer3",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer4",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer5",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer6",
+                                  pytest.param("http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer7", marks=pytest.mark.xfail),
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer8",
+                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer9"])'''
+    def test_user_can_add_product_to_basket(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer0"
+        page = ProductPage(browser, link)   # инициализируем Page Object, передаем в конструктор экземпляр драйвера и url адрес 
+        page.open()                         # открываем страницу
+    
+        # Получаем название и цену товара
+        product_name = page.get_product_name()
+        product_price = page.get_product_price()
+        # Добавляем товар в корзину
+        page.add_to_basket()
+        # Получаем код
+        page.solve_quiz_and_get_code()
+    
+        # Получаем сообщение об успешном добавлении товара и сообщение о стоимости корзины
+        success_message = page.get_success_message()
+        cart_price_message = page.get_cart_price_message()
+        product_name_in_success_message = page.get_product_name_in_success_message()
+    
+        time.sleep(1)
+    
+        # Проверяем результаты
+        assert "has been added to your basket." in success_message #The shellcoder's handbook has been added to your basket.
+        assert product_name == product_name_in_success_message
+        assert product_price in cart_price_message
     
     
     
